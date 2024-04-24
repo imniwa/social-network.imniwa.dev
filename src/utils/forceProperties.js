@@ -5,8 +5,8 @@ export const defaultForceProperties = {
   },
   charge: {
     enabled: true,
-    strength: -30,
-    distanceMin: 1,
+    strength: -50,
+    distanceMin: 100,
     distanceMax: 2000,
   },
   collide: {

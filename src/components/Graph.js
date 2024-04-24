@@ -3,7 +3,11 @@ import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { defaultForceProperties } from "@/utils/forceProperties";
 
-const ForceDirectedGraph = ({ data, forceProperties = defaultForceProperties }) => {
+const ForceDirectedGraph = ({
+  data,
+  centrality,
+  forceProperties = defaultForceProperties,
+}) => {
   const svgRef = useRef(null);
 
   useEffect(() => {
@@ -13,6 +17,14 @@ const ForceDirectedGraph = ({ data, forceProperties = defaultForceProperties }) 
 
     const links = data.links.map((d) => ({ ...d }));
     const nodes = data.nodes.map((d) => ({ ...d }));
+
+    const scaleSize = d3
+      .scaleLinear()
+      .domain([
+        d3.min(nodes, (d) => d[centrality]),
+        d3.max(nodes, (d) => d[centrality]),
+      ])
+      .range([5, 25]);
 
     const simulation = d3
       .forceSimulation(nodes)
@@ -88,7 +100,7 @@ const ForceDirectedGraph = ({ data, forceProperties = defaultForceProperties }) 
       .selectAll()
       .data(links)
       .join("line")
-      .attr("stroke-width", (d) => Math.sqrt(d.value));
+      .attr("stroke-width", (d) => d.weight);
 
     const node = container
       .append("g")
@@ -97,10 +109,31 @@ const ForceDirectedGraph = ({ data, forceProperties = defaultForceProperties }) 
       .selectAll()
       .data(nodes)
       .join("circle")
-      .attr("r", 5)
-      .attr("fill", (d) => color(0));
+      .attr("r", (d) => scaleSize(d[centrality]) || 5)
+      .attr("fill", (d) => {
+        if (centrality) {
+          return color(d[`${centrality}_category`]);
+        }
+        return color(0);
+      })
+      .on("click", function (event, d) {
+        let { target } = event;
+        console.log(target);
+      });
 
-    node.append("title").text((d) => d.id);
+    // tooltip
+    node.append("title")
+      .text((d) => d.username)
+    
+    // node
+    // .append("g")
+    // .append("text")
+    // .attr("x", (d) => scaleSize(d[centrality]) + 5)
+    // .attr("y", 3)
+    // .text(function (d) {
+    //   return d.username;
+    // });
+
 
     node.call(
       d3
@@ -151,7 +184,7 @@ const ForceDirectedGraph = ({ data, forceProperties = defaultForceProperties }) 
       simulation.stop();
       window.removeEventListener("resize", handleResize);
     };
-  }, [data, forceProperties]);
+  }, [data, forceProperties, centrality]);
 
   return <svg ref={svgRef}></svg>;
 };
