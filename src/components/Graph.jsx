@@ -100,7 +100,21 @@ const ForceDirectedGraph = ({
       .selectAll()
       .data(links)
       .join("line")
-      .attr("stroke-width", (d) => d.weight);
+      .attr("stroke-width", (d) => d.weight)
+      .attr("marker-end", "url(#arrow)");
+
+    container
+      .append("svg:defs")
+      .append("svg:marker")
+      .attr("id", "arrow")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 4)
+      .attr("markerWidth", 2)
+      .attr("markerHeight", 2)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("d", "M0,-5L10,0L0,5")
+      .attr("fill", "#999");
 
     const node = container
       .append("g")
@@ -122,9 +136,8 @@ const ForceDirectedGraph = ({
       });
 
     // tooltip
-    node.append("title")
-      .text((d) => d.username)
-    
+    node.append("title").text((d) => d.username);
+
     // node
     // .append("g")
     // .append("text")
@@ -133,7 +146,6 @@ const ForceDirectedGraph = ({
     // .text(function (d) {
     //   return d.username;
     // });
-
 
     node.call(
       d3
@@ -181,6 +193,7 @@ const ForceDirectedGraph = ({
     window.addEventListener("resize", handleResize);
 
     return () => {
+      svg.selectChild().remove();
       simulation.stop();
       window.removeEventListener("resize", handleResize);
     };
