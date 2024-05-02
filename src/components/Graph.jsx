@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { defaultForceProperties } from "@/utils/forceProperties";
+import { useRouter } from "next/navigation";
 
 const ForceDirectedGraph = ({
   data,
@@ -9,6 +10,20 @@ const ForceDirectedGraph = ({
   forceProperties = defaultForceProperties,
 }) => {
   const svgRef = useRef(null);
+  const router = useRouter();
+
+  const handleClickNode = (d) => {
+    const data = {
+      username: d.username,
+      degree: d.degree_c,
+      betweenness: d.betweenness_c,
+      closeness: d.closeness_c,
+      eigenvector: d.eigenvector_c
+    }
+    const params = new URLSearchParams(data);
+    const query = params ? `?${params.toString()}` : "";
+    router.push(`/data${query}`)
+  };
 
   useEffect(() => {
     const width = () => window.innerWidth;
@@ -100,21 +115,9 @@ const ForceDirectedGraph = ({
       .selectAll()
       .data(links)
       .join("line")
+      .attr("stroke", (d) => color(d.weight))
       .attr("stroke-width", (d) => d.weight)
       .attr("marker-end", "url(#arrow)");
-
-    container
-      .append("svg:defs")
-      .append("svg:marker")
-      .attr("id", "arrow")
-      .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 4)
-      .attr("markerWidth", 2)
-      .attr("markerHeight", 2)
-      .attr("orient", "auto")
-      .append("path")
-      .attr("d", "M0,-5L10,0L0,5")
-      .attr("fill", "#999");
 
     const node = container
       .append("g")
@@ -131,8 +134,7 @@ const ForceDirectedGraph = ({
         return color(0);
       })
       .on("click", function (event, d) {
-        let { target } = event;
-        console.log(target);
+        handleClickNode(d);
       });
 
     // tooltip
