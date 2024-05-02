@@ -28,10 +28,11 @@ export default function Page() {
           Back to visualization
         </a>
       </div>
-      <Suspense fallback={<Loading />}>
+      <Loading />
+      {/* <Suspense fallback={<Loading />}>
         <NodeDetails />
         <DataTable />
-      </Suspense>
+      </Suspense> */}
     </div>
   );
 }

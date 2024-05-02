@@ -1,7 +1,7 @@
 export default function Loading() {
   return (
-    <div className="bg-slate-200 border border-slate-200 p-40 rounded-md">
-      <div className="mx-auto">
+    <div className="bg-slate-200 border border-slate-200 h-screen rounded-md">
+      <div className="flex h-full place-items-center">
         <svg
           className="mx-auto"
           width="105"
@@ -20,7 +20,7 @@ export default function Loading() {
               repeatCount="indefinite"
             />
           </circle>
-          <circle cx="12.5" cy="52.5" r="12.5" fill-opacity=".5">
+          <circle cx="12.5" cy="52.5" r="12.5" fillOpacity=".5">
             <animate
               attributeName="fill-opacity"
               begin="100ms"
