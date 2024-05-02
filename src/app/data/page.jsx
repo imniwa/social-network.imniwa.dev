@@ -5,8 +5,12 @@ export const metadata = {
   title: "Data used in this project",
 };
 
-const NodeDetails = dynamic(() => import("@/components/NodeDetails"));
-const DataTable = dynamic(() => import("@/components/DataTable"));
+const NodeDetails = dynamic(() => import("@/components/NodeDetails"), {
+  ssr: false,
+});
+const DataTable = dynamic(() => import("@/components/DataTable"), {
+  ssr: false
+});
 
 export default function Page() {
   return (
