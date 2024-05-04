@@ -1,104 +1,153 @@
 "use client";
 import tweet from "@/data/tweet.json";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { clsx } from "clsx";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 export default function DataTable() {
-  const RANGE = 10;
-  const searchParams = useSearchParams();
-  const [iteration, setIteration] = useState(0);
-  const [filtered, setFiltered] = useState(false);
-  const username = searchParams.get("username");
   const { data } = tweet;
 
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+  const [count, setCount] = useState(data.length);
+
+  const username = searchParams.get("username");
+  const iteration = parseInt(searchParams.get("iteration")) || 0;
+  const RANGE = 10;
+
   useEffect(() => {
-    setFiltered(typeof username === "string");
-    return () => {
-      setFiltered(false);
-    };
-  }, [filtered, username]);
+    let temp = data
+      .filter((v, i) =>
+        username ? v.username.toLowerCase() === username : true
+      )
+      .map((v, i) => v.source.length);
+    setCount(temp.reduce((a, b) => a + b, 0));
+  }, [username, data]);
 
   const handleNext = () => {
-    if (iteration >= Math.ceil(data.length / RANGE)) return;
-    setIteration(iteration + 1);
+    const params = new URLSearchParams(searchParams);
+    if (username) {
+      if (iteration >= Math.floor(count / RANGE)) return;
+    }
+    if (iteration >= Math.floor(count / RANGE)) return;
+    params.set("iteration", iteration + 1);
+    const query = params ? `?${params.toString()}` : "";
+    router.push(`${pathname}${query}`, { scroll: false, shallow: true });
   };
 
   const handlePrevious = () => {
+    const params = new URLSearchParams(searchParams);
     if (iteration <= 0) return;
-    setIteration(iteration - 1);
+    params.set("iteration", iteration - 1);
+    const query = params ? `?${params.toString()}` : "";
+    router.push(`${pathname}${query}`, { scroll: false, shallow: true });
   };
 
   return (
     <div className="border border-slate-200 p-4 rounded-lg bg-slate-50">
       <table className="table-fixed w-full border-collapse border border-slate-200">
         <thead>
-          <tr className="capitalize gap-4 bg-slate-400">
+          <tr className="capitalize gap-4 bg-slate-300">
             <th className="border border-slate-200 w-1/12">#</th>
-            <th className="border border-slate-200 w-2/12">source</th>
-            <th className="border border-slate-200 w-2/12">target</th>
+            <th className="border border-slate-200 w-2/12">username</th>
             <th className="border border-slate-200 w-2/4">content</th>
-            <th className="border border-slate-200 w-2/4">extracted topic</th>
           </tr>
         </thead>
-        <tbody>
-          {data
-            .filter((e) =>
-              filtered
-                ? e.username === username || e.mention === username
-                : true
-            )
-            .slice(iteration * RANGE, iteration * RANGE + RANGE)
-            .map((e, i) => {
+        {
+          <tbody>
+            {!username &&
+              data
+                .map((v, i) => v.source)
+                .flat()
+                .slice(iteration * RANGE, iteration * RANGE + RANGE)
+                .map((k, j) => {
+                  return (
+                    <tr key={j}>
+                      <td className="border border-slate-200 text-center">
+                        {j + 10 * iteration + 1}
+                      </td>
+                      <td className="border border-slate-200 text-center">
+                        {k.username}
+                      </td>
+                      <td className="border border-slate-200 p-8">
+                        {k.content}
+                      </td>
+                    </tr>
+                  );
+                })}
+          </tbody>
+        }
+        {username &&
+          data
+            .filter((v, i) => v.username.toLowerCase() === username)
+            .map((v, i) => {
               return (
-                <tr key={i}>
-                  <td className="border border-slate-200 text-center">
-                    {i + 10 * iteration + 1}
-                  </td>
-                  <td className="border border-slate-200 text-center">
-                    {e.username}
-                  </td>
-                  <td className="border border-slate-200 text-center">
-                    {e.mention}
-                  </td>
-                  <td className="border border-slate-200 p-4">{e.raw_content}</td>
-                  <td className="border border-slate-200">
-                    <table className="table-auto w-full border-collapse border border-slate-200">
-                      <thead>
-                        <tr>
-                          <th className="border border-slate-200">Token</th>
-                          <th className="border border-slate-200">Score</th>
+                <tbody key={i}>
+                  {v.source
+                    .slice(iteration * RANGE, iteration * RANGE + RANGE)
+                    .map((k, j) => {
+                      return (
+                        <tr key={j}>
+                          <td className="border border-slate-200 text-center">
+                            {j + 10 * iteration + 1}
+                          </td>
+                          <td className="border border-slate-200 text-center">
+                            {k.username}
+                          </td>
+                          <td className="border border-slate-200 p-8">
+                            {k.content.split(" ").map((word, index) => {
+                              if (word.toLowerCase() === `@${username}`) {
+                                return (
+                                  <React.Fragment key={`y-${index}`}>
+                                    {" "}
+                                    <span className="bg-yellow-200 font-bold">
+                                      {word}
+                                    </span>{" "}
+                                  </React.Fragment>
+                                );
+                              }
+                              if (
+                                word.match(
+                                  new RegExp(/https?:\/\/\S+|www\.\S+/)
+                                )
+                              ) {
+                                return (
+                                  <React.Fragment key={`x-${index}`}>
+                                    {" "}
+                                    <a
+                                      href={word}
+                                      className="text-blue-500 underline"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      {word}
+                                    </a>{" "}
+                                  </React.Fragment>
+                                );
+                              }
+                              return (
+                                <React.Fragment key={`w-${index}`}>
+                                  {" "}
+                                  <span>{word}</span>{" "}
+                                </React.Fragment>
+                              );
+                            })}
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {e.tf_idf
-                          .sort((a, b) => b.score - a.score)
-                          .map((e, i) => {
-                            return (
-                              <tr key={i}>
-                                <td className="border border-slate-200 text-center">
-                                  {e.token}
-                                </td>
-                                <td className="border border-slate-200 text-center">
-                                  {e.score.toFixed(4)}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
+                      );
+                    })}
+                </tbody>
               );
             })}
-        </tbody>
       </table>
-      <div className="mt-4 flex flex-row-reverse">
+      <div className="mt-4 flex place-content-between">
+        <div className="py-2 italic">Total tweets count : {count}</div>
         <div className="flex gap-4">
           <button
             onClick={handlePrevious}
             className={clsx([
-              "text-slate-400 bg-slate-50 border border-slate-400 rounded-sm px-4 py-2",
+              "text-slate-400 bg-slate-50 border border-slate-400 rounded-md px-4 py-2",
               "hover:text-slate-800 hover:bg-white transition-all",
             ])}
           >
@@ -107,7 +156,7 @@ export default function DataTable() {
           <button
             onClick={handleNext}
             className={clsx([
-              "text-slate-400 bg-slate-50 border border-slate-400 rounded-sm px-4 py-2",
+              "text-slate-400 bg-slate-50 border border-slate-400 rounded-md px-4 py-2",
               "hover:text-slate-800 hover:bg-white transition-all",
             ])}
           >
