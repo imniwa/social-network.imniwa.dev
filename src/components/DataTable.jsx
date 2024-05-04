@@ -93,7 +93,14 @@ export default function DataTable() {
                             {j + 10 * iteration + 1}
                           </td>
                           <td className="border border-slate-200 text-center">
-                            {k.username}
+                            {
+                              k.username.toLowerCase() === username ?
+                                <span className="bg-yellow-200 font-bold">
+                                  {k.username}
+                                </span>
+                                :
+                                k.username
+                            }
                           </td>
                           <td className="border border-slate-200 p-8">
                             {k.content.split(" ").map((word, index) => {
