@@ -6,7 +6,7 @@ export default function TopicDetails({ topic }) {
         <h1 className="text-center font-bold">Extracted Topic</h1>
       </div>
       <hr className="border border-slate-200 my-2 w-2/12 mx-auto" />
-      <div className="flex gap-4 place-content-center capitalize">
+      <div className="flex gap-4 place-content-center capitalize flex-wrap">
         {topic.map((v, i) => {
           return (
             <div className="" key={i}>

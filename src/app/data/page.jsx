@@ -16,7 +16,7 @@ const DataTable = dynamic(() => import("@/components/DataTable"), {
 
 export default function Page() {
   return (
-    <div className="container mx-auto flex flex-col gap-4 py-8">
+    <div className="container mx-auto flex flex-col gap-4 py-8 px-2">
       <div className="border border-slate-200 p-4 rounded-md bg-slate-50">
         <a
           className={clsx([

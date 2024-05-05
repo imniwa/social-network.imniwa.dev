@@ -22,7 +22,7 @@ const ForceDirectedGraph = ({
     }
     const params = new URLSearchParams(data);
     const query = params ? `?${params.toString()}` : "";
-    router.push(`/data${query}`)
+    router.push(`/data${query}`, {scroll: false, shallow: true})
   };
 
   useEffect(() => {

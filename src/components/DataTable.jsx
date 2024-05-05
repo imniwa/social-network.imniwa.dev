@@ -175,7 +175,7 @@ export default function DataTable() {
               })}
         </table>
         <div className="mt-4 flex place-content-between">
-          <div className="py-2 italic">Total tweets count : {count}</div>
+          <div className="py-2 italic">Tweets count : {count}</div>
           <div className="flex gap-4">
             <button
               onClick={handlePrevious}
