@@ -62,8 +62,8 @@ export default function DataTable() {
           }
         />
       )}
-      <div className="border border-slate-200 p-4 rounded-lg bg-slate-50">
-        <table className="table-fixed w-full border-collapse border border-slate-200">
+      <div className="border border-slate-200 p-4 rounded-lg bg-slate-50 overflow-x-auto">
+        <table className="table-auto w-full border-collapse border border-slate-200">
           <thead>
             <tr className="capitalize gap-4 bg-slate-300">
               <th className="border border-slate-200 w-1/12">#</th>
