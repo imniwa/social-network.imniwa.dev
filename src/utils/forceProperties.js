@@ -5,13 +5,13 @@ export const defaultForceProperties = {
   },
   charge: {
     enabled: true,
-    strength: -50,
+    strength: -100,
     distanceMin: 100,
     distanceMax: 2000,
   },
   collide: {
     enabled: true,
-    strength: 0.7,
+    strength: 0.5,
     iterations: 1,
     radius: 5,
   },

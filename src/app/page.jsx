@@ -23,11 +23,11 @@ const Home = () => {
   return (
     <>
       <div className="relative">
-        <div className="absolute top-0 right-0 bg-slate-500/60">
+        <div className="absolute top-0 right-0 bg-slate-500/60 rounded-sm">
           <div className="p-8">
             <select
               name=""
-              className="p-2"
+              className="p-2 rounded-sm"
               value={centrality}
               onChange={(e) => handleSearch(e.target.value)}
             >

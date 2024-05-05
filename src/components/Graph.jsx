@@ -26,7 +26,7 @@ const ForceDirectedGraph = ({
         d3.min(nodes, (d) => d[centrality]),
         d3.max(nodes, (d) => d[centrality]),
       ])
-      .range([5, 25]);
+      .range([5, centrality === "closeness_c" ? 20 : 50]);
 
     const simulation = d3
       .forceSimulation(nodes)
@@ -97,22 +97,19 @@ const ForceDirectedGraph = ({
 
     const link = container
       .append("g")
-      .attr("stroke", "#999")
+      .attr("stroke", "#000")
       .attr("stroke-opacity", 0.6)
       .selectAll()
       .data(links)
       .join("line")
       .attr("stroke", (d) => color(d.weight))
-      .attr("stroke-width", (d) => d.weight)
-      .attr("marker-end", "url(#arrow)");
+      .attr("stroke-width", (d) => d.weight);
 
-    const node = container
-      .append("g")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 1.5)
-      .selectAll()
-      .data(nodes)
-      .join("circle")
+    const node = container.append("g").selectAll().data(nodes).join("g");
+
+    const circles = node
+      .append("circle")
+      .style("cursor", "pointer")
       .attr("r", (d) => scaleSize(d[centrality]) || 5)
       .attr("fill", (d) => {
         if (centrality) {
@@ -122,27 +119,32 @@ const ForceDirectedGraph = ({
       })
       .on("click", function (event, d) {
         handleClickNode(d);
-      });
+      })
+      .call(
+        d3
+          .drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended)
+      );
 
     // tooltip
     node.append("title").text((d) => d.username);
 
-    // node
-    // .append("g")
-    // .append("text")
-    // .attr("x", (d) => scaleSize(d[centrality]) + 5)
-    // .attr("y", 3)
-    // .text(function (d) {
-    //   return d.username;
-    // });
-
-    node.call(
-      d3
-        .drag()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended)
-    );
+    // title
+    node.filter((d) => centrality !== 'default' ? scaleSize(d[centrality]) > 10 : false)
+      .append("text")
+      .attr("font-size", "1.2rem")
+      .style("text-anchor", "middle")
+      .style("alignment-baseline", "middle")
+      .style("pointer-events", "none")
+      .style("user-select", "none")
+      .style("outline", "1px solid black")
+      .attr("x", 0)
+      .attr("y", 0)
+      .text(function (d) {
+        return d.username;
+      });
 
     function ticked() {
       link
@@ -151,11 +153,14 @@ const ForceDirectedGraph = ({
         .attr("x2", (d) => d.target.x)
         .attr("y2", (d) => d.target.y);
 
-      node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+      // node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+      node.attr("transform", function (d) {
+        return `translate(${d.x},${d.y})`;
+      });
     }
 
     function dragstarted(event) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
+      if (!event.active) simulation.alphaTarget(0.1).restart();
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
     }
@@ -175,7 +180,7 @@ const ForceDirectedGraph = ({
       container.attr("transform", event.transform);
     }
 
-    function handleClickNode(d){
+    function handleClickNode(d) {
       const data = {
         username: d.username,
         degree: d.degree_c,
@@ -186,11 +191,11 @@ const ForceDirectedGraph = ({
       const params = new URLSearchParams(data);
       const query = params ? `?${params.toString()}` : "";
       router.push(`/data${query}`, { scroll: false, shallow: true });
-    };
+    }
 
-    function handleResize(){
+    function handleResize() {
       svg.attr("viewBox", [0, 0, width(), height()]);
-    };
+    }
 
     window.addEventListener("resize", handleResize);
 
