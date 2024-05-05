@@ -12,19 +12,6 @@ const ForceDirectedGraph = ({
   const svgRef = useRef(null);
   const router = useRouter();
 
-  const handleClickNode = (d) => {
-    const data = {
-      username: d.username,
-      degree: d.degree_c,
-      betweenness: d.betweenness_c,
-      closeness: d.closeness_c,
-      eigenvector: d.eigenvector_c
-    }
-    const params = new URLSearchParams(data);
-    const query = params ? `?${params.toString()}` : "";
-    router.push(`/data${query}`, {scroll: false, shallow: true})
-  };
-
   useEffect(() => {
     const width = () => window.innerWidth;
     const height = () => window.innerHeight;
@@ -188,7 +175,20 @@ const ForceDirectedGraph = ({
       container.attr("transform", event.transform);
     }
 
-    const handleResize = () => {
+    function handleClickNode(d){
+      const data = {
+        username: d.username,
+        degree: d.degree_c,
+        betweenness: d.betweenness_c,
+        closeness: d.closeness_c,
+        eigenvector: d.eigenvector_c,
+      };
+      const params = new URLSearchParams(data);
+      const query = params ? `?${params.toString()}` : "";
+      router.push(`/data${query}`, { scroll: false, shallow: true });
+    };
+
+    function handleResize(){
       svg.attr("viewBox", [0, 0, width(), height()]);
     };
 
@@ -199,7 +199,7 @@ const ForceDirectedGraph = ({
       simulation.stop();
       window.removeEventListener("resize", handleResize);
     };
-  }, [data, forceProperties, centrality]);
+  }, [data, forceProperties, centrality, router]);
 
   return <svg ref={svgRef}></svg>;
 };
