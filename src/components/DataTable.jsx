@@ -120,6 +120,16 @@ export default function DataTable() {
                             </td>
                             <td className="border border-slate-200 p-8">
                               {k.content.split(" ").map((word, index) => {
+                                if (v.topic.includes(word.toLowerCase())) {
+                                  return (
+                                    <React.Fragment key={`z-${index}`}>
+                                      {" "}
+                                      <span className="bg-green-200 font-bold">
+                                        {word}
+                                      </span>{" "}
+                                    </React.Fragment>
+                                  );
+                                }
                                 if (word.toLowerCase() === `@${username}`) {
                                   return (
                                     <React.Fragment key={`y-${index}`}>
