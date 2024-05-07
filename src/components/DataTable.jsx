@@ -16,7 +16,7 @@ export default function DataTable() {
   const pathname = usePathname();
   const router = useRouter();
   const [count, setCount] = useState(data.length);
-  const [highlightWords, setHighlightWords] = useState([])
+  const [highlightWords, setHighlightWords] = useState([]);
 
   const username = searchParams.get("username").toLowerCase();
   const iteration = parseInt(searchParams.get("iteration")) || 0;
@@ -28,8 +28,12 @@ export default function DataTable() {
         username ? v.username.toLowerCase() === username : true
       )
       .map((v, i) => {
-        setHighlightWords([...new Set(v.topic.map((v, i) => v.map((v, i) => v.word.toLowerCase())).flat())])
-        return v.source.length
+        setHighlightWords([
+          ...new Set(
+            v.topic.map((v, i) => v.map((v, i) => v.word.toLowerCase())).flat()
+          ),
+        ]);
+        return v.source.length;
       });
     setCount(temp.reduce((a, b) => a + b, 0));
   }, [username, data]);
@@ -60,7 +64,9 @@ export default function DataTable() {
           topic={
             data
               .filter((v, i) => v.username.toLowerCase() === username)
-              .reduce((a, b) => {a.topic, b.topic}).topic
+              .reduce((a, b) => {
+                a.topic, b.topic;
+              }).topic
           }
         />
       )}
@@ -122,16 +128,6 @@ export default function DataTable() {
                             </td>
                             <td className="border border-slate-200 p-8">
                               {k.content.split(" ").map((word, index) => {
-                                if (highlightWords.includes(word.toLowerCase().replace(/[^a-zA-Z0-9]/g,''))) {
-                                  return (
-                                    <React.Fragment key={`z-${index}`}>
-                                      {" "}
-                                      <span className="bg-green-200 font-bold">
-                                        {word}
-                                      </span>{" "}
-                                    </React.Fragment>
-                                  );
-                                }
                                 if (word.toLowerCase() === `@${username}`) {
                                   return (
                                     <React.Fragment key={`y-${index}`}>
@@ -158,6 +154,22 @@ export default function DataTable() {
                                       >
                                         {word}
                                       </a>{" "}
+                                    </React.Fragment>
+                                  );
+                                }
+                                if (
+                                  highlightWords.includes(
+                                    word
+                                      .toLowerCase()
+                                      .replace(/[^a-zA-Z0-9]/g, "")
+                                  )
+                                ) {
+                                  return (
+                                    <React.Fragment key={`z-${index}`}>
+                                      {" "}
+                                      <span className="bg-green-200 font-bold">
+                                        {word}
+                                      </span>{" "}
                                     </React.Fragment>
                                   );
                                 }
