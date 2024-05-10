@@ -16,6 +16,7 @@ const ForceDirectedGraph = ({
     const width = () => window.innerWidth;
     const height = () => window.innerHeight;
     const color = d3.scaleOrdinal(d3.schemeCategory10);
+    const edgeColor = d3.scaleOrdinal(d3.schemeAccent);
 
     const links = data.links.map((d) => ({ ...d }));
     const nodes = data.nodes.map((d) => ({ ...d }));
@@ -102,7 +103,7 @@ const ForceDirectedGraph = ({
       .selectAll()
       .data(links)
       .join("line")
-      .attr("stroke", (d) => color(d.weight))
+      .attr("stroke", (d) => edgeColor(d.weight))
       .attr("stroke-width", (d) => d.weight);
 
     const node = container.append("g").selectAll().data(nodes).join("g");
@@ -132,9 +133,9 @@ const ForceDirectedGraph = ({
     node.append("title").text((d) => d.username);
 
     // title
-    node.filter((d) => centrality !== 'default' ? scaleSize(d[centrality]) > 10 : false)
+    node.filter((d) => centrality !== 'default' ? scaleSize(d[centrality]) >= (centrality === 'closeness_c' ? 20 : 10) : false)
       .append("text")
-      .attr("font-size", "1.2rem")
+      .attr("font-size", "4.2rem")
       .style("text-anchor", "middle")
       .style("alignment-baseline", "middle")
       .style("pointer-events", "none")
